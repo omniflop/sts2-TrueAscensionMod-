@@ -38,10 +38,10 @@ internal static class TrueAscensionBootstrap
                 postfix: new HarmonyMethod(typeof(TrueAscensionPatches), "AfterShouldInterceptWin"),
                 ref attempted, ref success);
 
-            // PATCH 3 — stop le wrap d'acte à l'ascension 10
+            // PATCH 3 — capture le niveau pré-loop + stop le wrap d'acte à l'ascension 10
             TryPatch("EndlessRuntime.TryWrapActIndex",
                 AccessTools.Method(endlessRuntimeType, "TryWrapActIndex"),
-                prefix: null,
+                prefix: new HarmonyMethod(typeof(TrueAscensionPatches), "BeforeTryWrapActIndex"),
                 postfix: new HarmonyMethod(typeof(TrueAscensionPatches), "AfterTryWrapActIndex"),
                 ref attempted, ref success);
 

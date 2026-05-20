@@ -43,7 +43,23 @@ internal static class TrueAscensionPatches
     }
 
     // -------------------------------------------------------------------------
-    // PATCH 3 — EndlessRuntime.TryWrapActIndex [Postfix]
+    // PATCH 3a — EndlessRuntime.TryWrapActIndex [Prefix]
+    // Capture le niveau d'ascension AVANT que EndlessMode le lève
+    // -------------------------------------------------------------------------
+    public static void BeforeTryWrapActIndex()
+    {
+        try
+        {
+            TrueAscensionRuntime.CapturePreLoopLevel();
+        }
+        catch (Exception ex)
+        {
+            TrueAscensionLog.Error("Erreur dans BeforeTryWrapActIndex.", ex);
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // PATCH 3b — EndlessRuntime.TryWrapActIndex [Postfix]
     // À l'ascension max → ne pas boucler l'index d'acte
     // -------------------------------------------------------------------------
     public static void AfterTryWrapActIndex(ref bool __result)
