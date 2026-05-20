@@ -207,7 +207,6 @@ internal static class TrueAscensionRuntime
     public static void Reset()
     {
         _previousAscensionLevel = -1;
-        _preLoopAscensionLevel = -1;
         TrueAscensionLog.Info("État TrueAscension réinitialisé.");
     }
 }
