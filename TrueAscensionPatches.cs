@@ -47,7 +47,7 @@ internal static class TrueAscensionPatches
     // Injecte le nouveau niveau d'ascension dans la seed de loop
     // → chaque ascension produit une map différente pour le même numéro de loop
     // -------------------------------------------------------------------------
-    public static void AfterGetDeterministicSeed(ref string __result)
+    public static void AfterGetDeterministicSeed(ref uint __result)
     {
         try
         {
@@ -55,8 +55,8 @@ internal static class TrueAscensionPatches
             if (preLoopLevel >= 0)
             {
                 int newLevel = preLoopLevel + 1;
-                __result += $"|A{newLevel}";
-                TrueAscensionLog.Info($"Seed loop modifiée pour A{newLevel} : {__result}");
+                __result = __result * 31 + (uint)newLevel;
+                TrueAscensionLog.Info($"Seed déterministe modifiée pour A{newLevel} : {__result}");
             }
         }
         catch (Exception ex)
