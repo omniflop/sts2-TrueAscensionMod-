@@ -51,12 +51,11 @@ internal static class TrueAscensionPatches
     {
         try
         {
-            int preLoopLevel = TrueAscensionRuntime.GetPreLoopLevel();
-            if (preLoopLevel >= 0)
+            int level = TrueAscensionRuntime.GetCurrentAscensionLevel();
+            if (level > 0)
             {
-                int newLevel = preLoopLevel + 1;
-                __result = __result * 31 + (uint)newLevel;
-                TrueAscensionLog.Info($"Seed déterministe modifiée pour A{newLevel} : {__result}");
+                __result = __result * 31 + (uint)level;
+                TrueAscensionLog.Info($"Seed déterministe modifiée pour A{level} : {__result}");
             }
         }
         catch (Exception ex)
