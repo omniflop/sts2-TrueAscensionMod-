@@ -43,6 +43,29 @@ internal static class TrueAscensionPatches
     }
 
     // -------------------------------------------------------------------------
+    // PATCH 6 — EndlessRuntime.GetDeterministicSeed [Postfix]
+    // Injecte le nouveau niveau d'ascension dans la seed de loop
+    // → chaque ascension produit une map différente pour le même numéro de loop
+    // -------------------------------------------------------------------------
+    public static void AfterGetDeterministicSeed(ref string __result)
+    {
+        try
+        {
+            int preLoopLevel = TrueAscensionRuntime.GetPreLoopLevel();
+            if (preLoopLevel >= 0)
+            {
+                int newLevel = preLoopLevel + 1;
+                __result += $"|A{newLevel}";
+                TrueAscensionLog.Info($"Seed loop modifiée pour A{newLevel} : {__result}");
+            }
+        }
+        catch (Exception ex)
+        {
+            TrueAscensionLog.Error("Erreur dans AfterGetDeterministicSeed.", ex);
+        }
+    }
+
+    // -------------------------------------------------------------------------
     // PATCH 3a — EndlessRuntime.TryWrapActIndex [Prefix]
     // Capture le niveau d'ascension AVANT que EndlessMode le lève
     // -------------------------------------------------------------------------

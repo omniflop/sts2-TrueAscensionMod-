@@ -38,6 +38,13 @@ internal static class TrueAscensionBootstrap
                 postfix: new HarmonyMethod(typeof(TrueAscensionPatches), "AfterShouldInterceptWin"),
                 ref attempted, ref success);
 
+            // PATCH 6 — injecte l'ascension dans la seed de map pour que chaque niveau produise une map unique
+            TryPatch("EndlessRuntime.GetDeterministicSeed",
+                AccessTools.Method(endlessRuntimeType, "GetDeterministicSeed"),
+                prefix: null,
+                postfix: new HarmonyMethod(typeof(TrueAscensionPatches), "AfterGetDeterministicSeed"),
+                ref attempted, ref success);
+
             // PATCH 3 — capture le niveau pré-loop + stop le wrap d'acte à l'ascension 10
             TryPatch("EndlessRuntime.TryWrapActIndex",
                 AccessTools.Method(endlessRuntimeType, "TryWrapActIndex"),

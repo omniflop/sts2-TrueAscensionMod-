@@ -88,6 +88,8 @@ internal static class TrueAscensionRuntime
         TrueAscensionLog.Info($"Pre-loop level capturé : {_preLoopAscensionLevel}");
     }
 
+    public static int GetPreLoopLevel() => _preLoopAscensionLevel;
+
     /// <summary>
     /// Appelé après chaque loop par le patch sur InitializeSavedRun.
     /// Applique uniquement les effets d'ascension NOUVEAUX (delta entre ancien et nouveau niveau).
@@ -178,13 +180,27 @@ internal static class TrueAscensionRuntime
         {
             try
             {
-                // On passe par ApplyAscensionEffects du RunManager avec un AscensionManager(5)
-                // mais on doit éviter de réappliquer TightBelt → on crée un manager(5)
-                // et on annule TightBelt si déjà appliqué (déjà géré par oldLevel >= 4)
+                // ApplyAscensionEffects(A5) applique TightBelt(A4) ET AscendersBane(A5).
+                // Si TightBelt était déjà actif (oldLevel >= A4), on annule sa réapplication après.
                 var tempManager = Activator.CreateInstance(AscensionManagerType, ascendersBaneLevel)!;
                 RunManagerAscensionManager.SetValue(runManager, tempManager);
                 ApplyAscensionEffects.Invoke(runManager, new[] { player });
                 TrueAscensionLog.Info($"AscendersBane appliqué au joueur {player.GetType().Name}.");
+
+                if (oldLevel >= tightBeltLevel)
+                {
+                    var addPotionSlot = AccessTools.Method(player.GetType(), "AddToMaxPotionCount")
+                        ?? AccessTools.Method(player.GetType().BaseType!, "AddToMaxPotionCount");
+                    if (addPotionSlot != null)
+                    {
+                        addPotionSlot.Invoke(player, new object[] { 1 });
+                        TrueAscensionLog.Info("TightBelt réappliqué annulé (déjà actif).");
+                    }
+                    else
+                    {
+                        TrueAscensionLog.Error("AddToMaxPotionCount introuvable — TightBelt réappliqué non annulé.");
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -192,7 +208,6 @@ internal static class TrueAscensionRuntime
             }
             finally
             {
-                // Remet le vrai AscensionManager avec le niveau actuel
                 var realManager = Activator.CreateInstance(AscensionManagerType, newLevel)!;
                 RunManagerAscensionManager.SetValue(runManager, realManager);
             }
